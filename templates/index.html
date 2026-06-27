@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+
+  <div class="dash-header fade-up">
+    <h1 class="dash-greeting">
+      Hello, <span class="grad-text">{{ user.username or 'there' }}</span> 👋
+    </h1>
+    <p class="dash-sub">
+      Choose a module below to begin your mental wellness assessment.
+    </p>
+  </div>
+
+  <div class="modules-grid fade-up-2">
+
+    <!-- Depression Assessment -->
+    <div class="card module-card card-tilt">
+      <div class="card-inner">
+        <div class="mod-icon">📋</div>
+        <h3 class="mod-title">Depression Assessment</h3>
+        <p class="mod-desc">
+          A comprehensive 18-factor questionnaire powered by a Random Forest classifier
+          trained on clinical data to estimate your depression risk level.
+        </p>
+        <a href="{{ url_for('depression') }}" class="btn btn-primary">Start Assessment →</a>
+      </div>
+    </div>
+
+    <!-- Sentiment Analysis -->
+    <div class="card module-card card-tilt">
+      <div class="card-inner">
+        <div class="mod-icon sky-bg">💬</div>
+        <h3 class="mod-title">Sentiment Analysis</h3>
+        <p class="mod-desc">
+          Type or speak your thoughts and get instant sentiment feedback.
+          A DistilBERT NLP model analyses the emotional tone of your responses.
+        </p>
+        <a href="{{ url_for('sentiment') }}" class="btn btn-outline">Open Sentiment →</a>
+      </div>
+    </div>
+
+    <!-- Emotion Detection -->
+    <div class="card module-card card-tilt">
+      <div class="card-inner">
+        <div class="mod-icon safe-bg">👁️</div>
+        <h3 class="mod-title">Emotion Detection</h3>
+        <p class="mod-desc">
+          Live facial emotion recognition via your webcam. A deep CNN identifies
+          seven emotional states — Happy, Sad, Angry, Fearful, Disgusted, Surprised, Neutral.
+        </p>
+        <a href="{{ url_for('emotion') }}" class="btn btn-outline">Open Camera →</a>
+      </div>
+    </div>
+
+    <!-- Results -->
+    <div class="card module-card card-tilt">
+      <div class="card-inner">
+        <div class="mod-icon warn-bg">📊</div>
+        <h3 class="mod-title">Combined Results</h3>
+        <p class="mod-desc">
+          View a unified dashboard combining your depression assessment result,
+          sentiment score, and emotion detection history in one place.
+        </p>
+        <a href="{{ url_for('result') }}" class="btn btn-outline">View Results →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="card" style="padding:20px 28px; margin-top:28px; border-color:rgba(251,191,36,0.25); background:var(--warn-dim);">
+    <p style="font-size:13px; color:var(--warn); margin:0;">
+      ⚠️ <strong>Important:</strong> MindScan is an educational tool only. Results are not a clinical diagnosis.
+      If you are experiencing mental health difficulties, please consult a qualified professional.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

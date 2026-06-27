@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Sentiment Analysis{% endblock %}
+
+{% block content %}
+<div class="sentiment-wrap">
+
+  <div class="fade-up">
+    <h1 class="sent-title">Sentiment <span class="grad-text">Analysis</span></h1>
+    <p style="color:var(--text-muted); font-size:14px; margin-bottom:32px;">
+      Type your response to the question below and click Analyse, or press <kbd style="background:var(--surface);border:1px solid var(--border);padding:2px 7px;border-radius:4px;font-size:12px;">Ctrl+Enter</kbd>.
+    </p>
+  </div>
+
+  <!-- Question card -->
+  <div class="card question-card fade-up-2">
+    <span class="question-label">
+      <span class="status-dot"></span> Today's Reflection Prompt
+    </span>
+    <p class="question-text" id="questionText">{{ question }}</p>
+    <button class="btn btn-ghost btn-sm" style="margin-top:16px;" onclick="getNextQuestion()">
+      Next Question →
+    </button>
+  </div>
+
+  <!-- Input area -->
+  <div class="card fade-up-3" style="padding:28px; margin-top:20px;">
+    <label class="field-label">Your Response</label>
+    <textarea id="textInput" class="text-area"
+              rows="5"
+              placeholder="Write freely — share how you're feeling, what's on your mind, or your answer to the prompt above…"></textarea>
+
+    <div style="display:flex; gap:12px; margin-top:16px;">
+      <button class="btn btn-primary" onclick="analyzeText()">Analyse Sentiment</button>
+      <button class="btn btn-ghost" onclick="startRealTimeSpeech()" id="speechStartBtn">🎤 Speak</button>
+      <button class="btn btn-ghost" id="speechStopBtn" style="display:none; color:var(--risk);"
+              onclick="stopRealTimeSpeech()">⏹ Stop</button>
+    </div>
+
+    <!-- Live speech status -->
+    <p id="speechStatus" style="font-size:13px; color:var(--text-muted); margin-top:10px; display:none;">
+      <span class="status-dot"></span> Listening…
+    </p>
+  </div>
+
+  <!-- Result & gauge -->
+  <div class="card" style="padding:28px; margin-top:20px;" id="gaugeCard">
+    <span class="field-label">Sentiment Result</span>
+
+    <div id="sentResult" style="margin-bottom:20px;">
+      <p style="color:var(--text-muted); font-size:14px;">Awaiting analysis…</p>
+    </div>
+
+    <div class="gauge-wrap">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span class="gauge-label">POSITIVE</span>
+        <span class="gauge-label" id="gaugePct">—</span>
+      </div>
+      <div class="gauge-bar">
+        <div class="gauge-fill positive" id="gaugeFillPos"></div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; margin:10px 0 6px;">
+        <span class="gauge-label">NEGATIVE</span>
+      </div>
+      <div class="gauge-bar">
+        <div class="gauge-fill negative" id="gaugeFillNeg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="card" style="padding:28px; margin-top:20px;">
+    <span class="field-label" style="display:block; margin-bottom:12px;">Recent Analyses</span>
+    <ul class="history-list" id="historyList">
+      <li class="history-item" style="justify-content:center; color:var(--text-muted);">
+        Your analysis history will appear here.
+      </li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Real-time speech using Web Speech API (runs in browser, no server mic needed)
+let recognition;
+
+function startRealTimeSpeech() {
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRec) { alert('Speech recognition is not supported in your browser.'); return; }
+
+  recognition = new SpeechRec();
+  recognition.lang = 'en-US';
+  recognition.interimResults = false;
+
+  recognition.onstart = () => {
+    document.getElementById('speechStartBtn').style.display = 'none';
+    document.getElementById('speechStopBtn').style.display  = '';
+    document.getElementById('speechStatus').style.display   = '';
+  };
+
+  recognition.onresult = e => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('textInput').value = text;
+    analyzeText();
+  };
+
+  recognition.onerror = e => {
+    document.getElementById('speechStatus').textContent = 'Error: ' + e.error;
+  };
+
+  recognition.onend = () => {
+    document.getElementById('speechStartBtn').style.display = '';
+    document.getElementById('speechStopBtn').style.display  = 'none';
+    document.getElementById('speechStatus').style.display   = 'none';
+  };
+
+  recognition.start();
+}
+
+function stopRealTimeSpeech() {
+  if (recognition) recognition.stop();
+}
+</script>
+{% endblock %}

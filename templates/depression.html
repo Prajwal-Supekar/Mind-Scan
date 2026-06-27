@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}Depression Assessment{% endblock %}
+
+{% block content %}
+<div class="wizard-wrap">
+
+  <div class="wizard-header fade-up">
+    <h1 class="wizard-title">Depression <span class="grad-text">Assessment</span></h1>
+    <p class="wizard-sub">Answer honestly across 4 sections — this usually takes 3–5 minutes.</p>
+  </div>
+
+  <!-- ── Result banners (shown after prediction) ── -->
+  {% if prediction_text %}
+  <div class="pred-banner {% if 'Not At' in prediction_text %}not-risk{% else %}at-risk{% endif %} fade-up">
+    <span class="pred-icon">{% if 'Not At' in prediction_text %}✅{% else %}⚠️{% endif %}</span>
+    <h3 class="pred-title">{{ prediction_text }}</h3>
+    <p class="pred-msg">
+      {% if 'Not At' in prediction_text %}
+        Based on your responses, your current indicators do not suggest high depression risk.
+        Continue healthy habits and check in regularly.
+      {% else %}
+        Your responses indicate elevated risk factors. Please consider speaking with a
+        mental health professional for personalised guidance.
+      {% endif %}
+    </p>
+  </div>
+  {% endif %}
+
+  {% if error_text %}
+  <div class="pred-banner error-banner fade-up">
+    <span class="pred-icon">⚠️</span>
+    <h3 class="pred-title">Something went wrong</h3>
+    <p class="pred-msg">{{ error_text }}</p>
+  </div>
+  {% endif %}
+
+  {% if not prediction_text and not error_text %}
+
+  <!-- ── Step progress tracker ── -->
+  <div class="step-track fade-up-2">
+    <div class="step-item">
+      <div class="step-dot active" id="dot-1">1</div>
+      <span class="step-label">Personal</span>
+    </div>
+    <div class="step-line"><div class="step-line-fill" id="line-1"></div></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot-2">2</div>
+      <span class="step-label">History</span>
+    </div>
+    <div class="step-line"><div class="step-line-fill" id="line-2"></div></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot-3">3</div>
+      <span class="step-label">Lifestyle</span>
+    </div>
+    <div class="step-line"><div class="step-line-fill" id="line-3"></div></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot-4">4</div>
+      <span class="step-label">Mental State</span>
+    </div>
+  </div>
+
+  <!-- ── The form (all steps inside one <form>) ── -->
+  <form id="wizardForm" method="POST" action="/predict">
+
+    <!-- STEP 1: Personal Info -->
+    <div class="wizard-step active" id="step-1">
+      <h3 class="step-section-title">Personal Information</h3>
+      <div class="form-grid">
+
+        <div class="field">
+          <label class="field-label">Age</label>
+          <input type="number" name="age" class="field-input" min="10" max="100" placeholder="e.g. 25" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Gender</label>
+          <select name="gender" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">Male</option>
+            <option value="1">Female</option>
+            <option value="2">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Education Level</label>
+          <select name="education" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">High School</option>
+            <option value="1">Bachelor's</option>
+            <option value="2">Master's</option>
+            <option value="3">PhD</option>
+            <option value="4">Other</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Employment Status</label>
+          <select name="employment" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">Unemployed</option>
+            <option value="1">Employed</option>
+            <option value="2">Student</option>
+            <option value="3">Retired</option>
+          </select>
+        </div>
+
+        <div class="field span-full">
+          <label class="field-label">Marital Status</label>
+          <select name="marital_status" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">Single</option>
+            <option value="1">Married</option>
+            <option value="2">Divorced</option>
+            <option value="3">Widowed</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="wizard-nav">
+        <span></span>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Next — History →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2: Mental Health History -->
+    <div class="wizard-step" id="step-2">
+      <h3 class="step-section-title">Mental Health History</h3>
+      <div class="form-grid">
+
+        <div class="field">
+          <label class="field-label">Personal History of Depression</label>
+          <select name="history_of_depression" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Family History of Mental Health Issues</label>
+          <select name="family_history" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="field span-full">
+          <label class="field-label">Have you received treatment for mental health before?</label>
+          <select name="past_treatments" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="wizard-nav">
+        <button type="button" class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Next — Lifestyle →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Lifestyle -->
+    <div class="wizard-step" id="step-3">
+      <h3 class="step-section-title">Lifestyle Factors</h3>
+      <div class="form-grid">
+
+        <div class="field">
+          <label class="field-label">Average Sleep Duration (hrs/day)</label>
+          <input type="number" name="sleep_duration" class="field-input" step="0.1" min="0" max="24" placeholder="e.g. 7.5" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Physical Activity (hrs/week)</label>
+          <input type="number" name="physical_activity" class="field-input" step="0.1" min="0" max="60" placeholder="e.g. 5" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Diet Quality</label>
+          <select name="diet" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">Poor</option>
+            <option value="1">Balanced</option>
+            <option value="2">Healthy</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Substance Use (alcohol / drugs)</label>
+          <select name="substance_use" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="wizard-nav">
+        <button type="button" class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button type="button" class="btn btn-primary" onclick="nextStep()">Next — Mental State →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: Mental State -->
+    <div class="wizard-step" id="step-4">
+      <h3 class="step-section-title">Current Mental State</h3>
+      <div class="form-grid">
+
+        <div class="field">
+          <label class="field-label">Stress Level (1–10)</label>
+          <input type="number" name="stress_level" class="field-input" min="1" max="10" placeholder="7" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Anxiety Level (1–10)</label>
+          <input type="number" name="anxiety_level" class="field-input" min="1" max="10" placeholder="6" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Mood Variations (1–10)</label>
+          <input type="number" name="mood_variations" class="field-input" min="1" max="10" placeholder="5" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Social Support (1–10)</label>
+          <input type="number" name="social_support" class="field-input" min="1" max="10" placeholder="7" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Isolation Frequency</label>
+          <select name="isolation_frequency" class="field-input" required>
+            <option value="" disabled selected>Select…</option>
+            <option value="0">Rarely</option>
+            <option value="1">Sometimes</option>
+            <option value="2">Often</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Relationship Satisfaction (1–10)</label>
+          <input type="number" name="relationship_satisfaction" class="field-input" min="1" max="10" placeholder="8" required>
+        </div>
+
+      </div>
+      <div class="wizard-nav">
+        <button type="button" class="btn btn-ghost" onclick="prevStep()">← Back</button>
+        <button type="submit" class="btn btn-primary">
+          Analyse Now →
+        </button>
+      </div>
+    </div>
+
+  </form>
+  {% endif %}
+
+  {% if prediction_text or error_text %}
+  <div style="margin-top:28px; text-align:center;">
+    <a href="{{ url_for('depression') }}" class="btn btn-outline">Retake Assessment</a>
+    <a href="{{ url_for('result') }}" class="btn btn-ghost" style="margin-left:12px;">View Results</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Fix: re-init step dots after page load
+document.addEventListener('DOMContentLoaded', () => {
+  goToStep(1);
+});
+</script>
+{% endblock %}

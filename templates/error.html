@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindScan — Error</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<canvas id="neuralCanvas"></canvas>
+
+<div class="error-page">
+  <div class="card error-card">
+    <span class="error-code">{{ code or '?' }}</span>
+    <h1 class="error-title">Something went wrong</h1>
+    <p class="error-msg">{{ message or 'An unexpected error occurred.' }}</p>
+    <a href="/" class="btn btn-primary">← Back to Login</a>
+    <a href="{{ url_for('index') }}" class="btn btn-ghost" style="margin-left:12px;">Dashboard</a>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindScan — Sign In</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<canvas id="neuralCanvas"></canvas>
+
+<div class="auth-page">
+
+  <!-- Left panel -->
+  <div class="auth-left fade-up">
+    <div class="text-center">
+      <div style="font-size:64px; margin-bottom:16px;">🧠</div>
+      <h1 class="auth-brand-name"><span class="grad-text">Mind</span>Scan</h1>
+      <p class="auth-brand-tagline">
+        An intelligent mental health analysis platform combining depression assessment,
+        sentiment understanding, and real-time emotion detection.
+      </p>
+    </div>
+
+    <div class="auth-features">
+      <div class="auth-feat">
+        <span class="auth-feat-icon">📋</span>
+        <span>18-factor depression risk assessment</span>
+      </div>
+      <div class="auth-feat">
+        <span class="auth-feat-icon">💬</span>
+        <span>Real-time text &amp; speech sentiment analysis</span>
+      </div>
+      <div class="auth-feat">
+        <span class="auth-feat-icon">👁️</span>
+        <span>Live facial emotion recognition</span>
+      </div>
+      <div class="auth-feat">
+        <span class="auth-feat-icon">📊</span>
+        <span>Unified results dashboard</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel — login card -->
+  <div class="auth-right">
+    <div class="card auth-card fade-up-2" id="loginCard">
+
+      <h2 class="auth-title">Welcome back</h2>
+      <p class="auth-sub">Sign in to continue your mental wellness journey.</p>
+
+      {% if error %}
+      <div class="auth-error">{{ error }}</div>
+      {% endif %}
+
+      <form action="/" method="POST" id="loginForm">
+        <div class="field">
+          <label class="field-label" for="username">Username</label>
+          <input type="text" id="username" name="username"
+                 class="field-input" placeholder="Enter username"
+                 autocomplete="username" required>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="password">Password</label>
+          <input type="password" id="password" name="U_password"
+                 class="field-input" placeholder="••••••••"
+                 autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" id="loginBtn" class="btn btn-primary btn-full" style="margin-top:8px;">
+          Sign In →
+        </button>
+      </form>
+
+      <p style="text-align:center; margin-top:20px; font-size:14px; color:var(--text-muted);">
+        Don't have an account?
+        <a href="/register" style="color:var(--primary); text-decoration:none;">Register here</a>
+      </p>
+
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  // Shake card on server-side error
+  {% if error %}
+  document.getElementById('loginCard').classList.add('shake');
+  {% endif %}
+</script>
+</body>
+</html>

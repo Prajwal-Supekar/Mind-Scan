@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindScan — Register</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<canvas id="neuralCanvas"></canvas>
+
+<div class="auth-page">
+
+  <!-- Left panel -->
+  <div class="auth-left fade-up">
+    <div style="text-align:center;">
+      <div style="font-size:64px; margin-bottom:16px;">🧠</div>
+      <h1 class="auth-brand-name"><span class="grad-text">Mind</span>Scan</h1>
+      <p class="auth-brand-tagline">
+        Create your account to access personalised mental health insights
+        powered by machine learning.
+      </p>
+    </div>
+    <div class="auth-features" style="margin-top:40px;">
+      <div class="auth-feat"><span class="auth-feat-icon">🔒</span><span>Your data stays private and secure</span></div>
+      <div class="auth-feat"><span class="auth-feat-icon">🤖</span><span>AI-powered assessment tools</span></div>
+      <div class="auth-feat"><span class="auth-feat-icon">📈</span><span>Track your mental wellness over time</span></div>
+    </div>
+  </div>
+
+  <!-- Right panel -->
+  <div class="auth-right">
+    <div class="card auth-card fade-up-2" style="max-width:500px; padding:40px 36px;">
+
+      <h2 class="auth-title">Create account</h2>
+      <p class="auth-sub" style="margin-bottom:28px;">Fill in your details to get started.</p>
+
+      <div id="regMsg"></div>
+
+      <form id="regForm">
+        <div class="reg-grid">
+          <div class="field">
+            <label class="field-label">Full Name</label>
+            <input type="text" name="username" class="field-input" placeholder="John Doe" required>
+          </div>
+          <div class="field">
+            <label class="field-label">Email</label>
+            <input type="email" name="email" class="field-input" placeholder="you@email.com" required>
+          </div>
+          <div class="field">
+            <label class="field-label">Phone</label>
+            <input type="tel" name="phone_no" class="field-input" placeholder="+91 00000 00000" required>
+          </div>
+          <div class="field">
+            <label class="field-label">Gender</label>
+            <select name="gender" class="field-select field-input" required>
+              <option value="">Select…</option>
+              <option>Male</option><option>Female</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Age</label>
+            <input type="number" name="age" class="field-input" placeholder="25" min="10" max="100" required>
+          </div>
+          <div class="field">
+            <label class="field-label">Date of Birth</label>
+            <input type="date" name="dob" class="field-input" required>
+          </div>
+          <div class="field reg-full">
+            <label class="field-label">Address</label>
+            <input type="text" name="R_address" class="field-input" placeholder="City, Country" required>
+          </div>
+          <div class="field">
+            <label class="field-label">Password</label>
+            <input type="password" name="U_password" id="pw1" class="field-input" placeholder="••••••••" required>
+          </div>
+          <div class="field">
+            <label class="field-label">Confirm Password</label>
+            <input type="password" id="pw2" class="field-input" placeholder="••••••••" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full" style="margin-top:8px;">
+          Create Account →
+        </button>
+      </form>
+
+      <p style="text-align:center; margin-top:16px; font-size:14px; color:var(--text-muted);">
+        Already have an account?
+        <a href="/" style="color:var(--primary); text-decoration:none;">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+document.getElementById('regForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const msg = document.getElementById('regMsg');
+
+  if (document.getElementById('pw1').value !== document.getElementById('pw2').value) {
+    msg.innerHTML = '<div class="auth-error">Passwords do not match.</div>';
+    return;
+  }
+
+  const fd = new FormData(e.target);
+  const res = await fetch('/register', { method: 'POST', body: fd });
+
+  if (res.ok) {
+    msg.innerHTML = `<div class="auth-error" style="background:var(--safe-dim);border-color:rgba(52,211,153,0.3);color:var(--safe);">
+      ✓ Account created! Redirecting to login…</div>`;
+    setTimeout(() => window.location.href = '/', 1800);
+  } else {
+    const text = await res.text();
+    msg.innerHTML = `<div class="auth-error">${text}</div>`;
+  }
+});
+</script>
+</body>
+</html>

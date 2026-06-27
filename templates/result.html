@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Your Results{% endblock %}
+
+{% block content %}
+<div class="result-wrap">
+
+  <div class="fade-up">
+    <h1 class="result-title">Your <span class="grad-text">Results</span></h1>
+    <p class="result-sub">
+      Combined summary of all completed assessments for
+      <strong style="color:var(--text);">{{ user.username or 'you' }}</strong>.
+    </p>
+  </div>
+
+  <!-- User info card -->
+  {% if user and user.username %}
+  <div class="card user-card fade-up-2">
+    <h3 class="user-card-title">👤 Profile</h3>
+    <div class="user-info-grid">
+      <div>
+        <div class="user-field-label">Name</div>
+        <div class="user-field-value">{{ user.username }}</div>
+      </div>
+      <div>
+        <div class="user-field-label">Email</div>
+        <div class="user-field-value">{{ user.email or '—' }}</div>
+      </div>
+      <div>
+        <div class="user-field-label">Phone</div>
+        <div class="user-field-value">{{ user.phone_no or '—' }}</div>
+      </div>
+      <div>
+        <div class="user-field-label">Gender</div>
+        <div class="user-field-value">{{ user.gender or '—' }}</div>
+      </div>
+      <div>
+        <div class="user-field-label">Age</div>
+        <div class="user-field-value">{{ user.age or '—' }}</div>
+      </div>
+      <div>
+        <div class="user-field-label">Date of Birth</div>
+        <div class="user-field-value">{{ user.dob or '—' }}</div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Module results ── -->
+  <div class="result-grid fade-up-3">
+
+    <!-- Depression result -->
+    <div class="card result-card
+      {% if depression %}
+        {% if 'Not At' in depression %}card-safe{% else %}card-risk{% endif %}
+      {% endif %}
+      "
+      style="
+        {% if depression %}
+          {% if 'Not At' in depression %}
+            background:var(--safe-dim); border-color:rgba(52,211,153,0.3);
+          {% else %}
+            background:var(--risk-dim); border-color:rgba(251,113,133,0.3);
+          {% endif %}
+        {% endif %}
+      ">
+      <span class="res-icon">
+        {% if not depression %}📋
+        {% elif 'Not At' in depression %}✅
+        {% else %}⚠️{% endif %}
+      </span>
+      <span class="res-module">Depression Assessment</span>
+      <div class="res-value">
+        {% if depression %}
+          {{ depression }}
+        {% else %}
+          Not yet assessed
+        {% endif %}
+      </div>
+      {% if depression %}
+        <span class="res-badge {% if 'Not At' in depression %}safe{% else %}at-risk{% endif %}">
+          {% if 'Not At' in depression %}LOW RISK{% else %}AT RISK{% endif %}
+        </span>
+      {% else %}
+        <a href="{{ url_for('depression') }}" class="btn btn-outline btn-sm" style="margin-top:8px;">Take Assessment</a>
+      {% endif %}
+    </div>
+
+    <!-- Sentiment result -->
+    <div class="card result-card"
+      style="
+        {% if sentiment %}
+          {% set s = sentiment[0] if sentiment is iterable and sentiment is not string else sentiment %}
+          {% if s.label == 'POSITIVE' %}
+            background:var(--safe-dim); border-color:rgba(52,211,153,0.3);
+          {% elif s.label == 'NEGATIVE' %}
+            background:var(--risk-dim); border-color:rgba(251,113,133,0.3);
+          {% else %}
+            background:var(--warn-dim); border-color:rgba(251,191,36,0.3);
+          {% endif %}
+        {% endif %}
+      ">
+      <span class="res-icon">
+        {% if not sentiment %}💬
+        {% else %}
+          {% set s = sentiment[0] if sentiment is iterable and sentiment is not string else sentiment %}
+          {% if s.label == 'POSITIVE' %}😊
+          {% elif s.label == 'NEGATIVE' %}😔
+          {% else %}😐{% endif %}
+        {% endif %}
+      </span>
+      <span class="res-module">Sentiment Analysis</span>
+      <div class="res-value">
+        {% if sentiment %}
+          {% set s = sentiment[0] if sentiment is iterable and sentiment is not string else sentiment %}
+          {{ s.label | title }}
+          <br>
+          <span style="font-size:14px; color:var(--text-muted);">
+            {{ (s.score * 100) | round(1) }}% confidence
+          </span>
+        {% else %}
+          Not yet analysed
+        {% endif %}
+      </div>
+      {% if sentiment %}
+        {% set s = sentiment[0] if sentiment is iterable and sentiment is not string else sentiment %}
+        <span class="res-badge {{ s.label | lower }}">{{ s.label }}</span>
+      {% else %}
+        <a href="{{ url_for('sentiment') }}" class="btn btn-outline btn-sm" style="margin-top:8px;">Analyse Now</a>
+      {% endif %}
+    </div>
+
+    <!-- Emotion result -->
+    <div class="card result-card"
+      style="
+        {% if emotion and emotion not in ['No Face Detected','Error','Model unavailable','—'] %}
+          {% if emotion == 'Happy' %}background:rgba(52,211,153,0.08); border-color:rgba(52,211,153,0.3);
+          {% elif emotion in ['Sad','Angry','Fearful'] %}background:var(--risk-dim); border-color:rgba(251,113,133,0.3);
+          {% else %}background:var(--primary-dim); border-color:var(--border-hover);{% endif %}
+        {% endif %}
+      ">
+      <span class="res-icon">
+        {% if not emotion %}👁️
+        {% elif emotion == 'Happy' %}😊
+        {% elif emotion == 'Sad' %}😢
+        {% elif emotion == 'Angry' %}😠
+        {% elif emotion == 'Fearful' %}😨
+        {% elif emotion == 'Disgusted' %}🤢
+        {% elif emotion == 'Surprised' %}😮
+        {% elif emotion == 'Neutral' %}😐
+        {% else %}👁️{% endif %}
+      </span>
+      <span class="res-module">Emotion Detection</span>
+      <div class="res-value">{{ emotion or 'Not yet detected' }}</div>
+      {% if emotion and emotion not in ['No Face Detected','Error','Model unavailable'] %}
+        <span class="res-badge pending">DETECTED</span>
+      {% else %}
+        <a href="{{ url_for('emotion') }}" class="btn btn-outline btn-sm" style="margin-top:8px;">Open Camera</a>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Action row -->
+  <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;" class="fade-up">
+    <a href="{{ url_for('depression') }}" class="btn btn-outline">Retake Assessment</a>
+    <a href="{{ url_for('sentiment') }}"  class="btn btn-outline">New Sentiment</a>
+    <a href="{{ url_for('emotion') }}"    class="btn btn-outline">Open Camera</a>
+    <a href="{{ url_for('index') }}"      class="btn btn-ghost">← Dashboard</a>
+  </div>
+
+  <!-- Disclaimer -->
+  <div class="card" style="padding:20px 28px; margin-top:32px;
+       border-color:rgba(251,191,36,0.25); background:var(--warn-dim);">
+    <p style="font-size:13px; color:var(--warn); margin:0;">
+      ⚠️ <strong>Disclaimer:</strong> These results are generated by machine learning models
+      and are for educational purposes only. They do not constitute a medical diagnosis.
+      Please consult a qualified mental health professional for proper evaluation.
+    </p>
+  </div>
+
+</div>
+{% endblock %}
